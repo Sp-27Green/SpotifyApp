@@ -16,3 +16,6 @@ https://docs.expo.dev/versions/latest/sdk/async-storage/
 expo-web browser
 https://docs.expo.dev/versions/latest/sdk/webbrowser/
 ![image](https://github.com/user-attachments/assets/d7041f21-40bf-4822-936c-7e1fb35ff9c8)
+
+Good tutorial for react native. 
+https://www.tutorialspoint.com/react_native/react_native_state.htm
