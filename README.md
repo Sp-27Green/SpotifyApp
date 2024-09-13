@@ -19,3 +19,7 @@ https://docs.expo.dev/versions/latest/sdk/webbrowser/
 
 Good tutorial for react native. 
 https://www.tutorialspoint.com/react_native/react_native_state.htm
+
+
+I'm thinking about using this for screen navigation. 
+https://reactnative.dev/docs/navigation
