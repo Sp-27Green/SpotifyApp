@@ -21,5 +21,5 @@ Good tutorial for react native.
 https://www.tutorialspoint.com/react_native/react_native_state.htm
 
 
-I'm thinking about using this for screen navigation. 
-https://reactnative.dev/docs/navigation
+Tag navigation.  This is good and we might use this. 
+https://www.geeksforgeeks.org/react-native-tab-navigation-component/
