@@ -144,11 +144,13 @@ const getPlayer = async() => {
     }
   })
   .then((response) =>  response.json())
-  .then((responesJson) => {
+  .then((responseJson) => {
+    console.log(responseJson.devices[0].id)
     if(responseJson[0] != null){
-      AsyncStorage.setItem("player", responesJson.devices[0].id)
-      console.log(responesJson.devices[0].id)
+      AsyncStorage.setItem("player", responseJson.devices[0].id)
+      console.log(responseJson.devices[0].id)
     }
+    
     //need to send an alert if spotify device is not running. 
   })
   .catch((error) => {console.error(error); })
