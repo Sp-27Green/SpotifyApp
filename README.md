@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
@@ -48,3 +49,30 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+=======
+# SpotifyApp
+
+Need to download 
+Use Visual basic code
+
+expo – Use this to create the app environment. 
+https://docs.expo.dev/tutorial/create-your-first-app/ 
+
+Libraries needed: 
+expo-auth-session expo-crypto
+https://docs.expo.dev/versions/latest/sdk/auth-session/
+
+@react-native-community/async-storage
+https://docs.expo.dev/versions/latest/sdk/async-storage/
+
+expo-web browser
+https://docs.expo.dev/versions/latest/sdk/webbrowser/
+![image](https://github.com/user-attachments/assets/d7041f21-40bf-4822-936c-7e1fb35ff9c8)
+
+Good tutorial for react native. 
+https://www.tutorialspoint.com/react_native/react_native_state.htm
+
+
+Tag navigation.  This is good and we might use this. 
+https://www.geeksforgeeks.org/react-native-tab-navigation-component/
+>>>>>>> 2d60dd3141bee9b2ed9f1617d9b1707b86b65a49
