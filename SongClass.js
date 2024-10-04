@@ -1,6 +1,4 @@
-//Ready for Github and testing. 
-//Needs notes. 
-
+//Holds needed song info for a song object. 
 export class Song {
     constructor(songID, artist, songTitle, albumImage, tempo, energy) {
         this.songID = songID

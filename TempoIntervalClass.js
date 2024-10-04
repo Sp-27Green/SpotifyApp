@@ -1,6 +1,6 @@
 import {newSongHashTable} from "./Tempo.js"
 
-//Temp Interval Clas holds the different intervals of the tempofied playlist.  
+//Temp Interval Class holds the different intervals of the tempofied playlist.  
 export class TempoInterval{
     //Constructor. Holds the information needed for the interval as well as an array of Song Objects for the interval.
     constructor(lowTempo, highTempo, intervalType, songAmount){

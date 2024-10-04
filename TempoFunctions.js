@@ -1,10 +1,9 @@
-//Need to update accessToken for experiration retrieval 
+//Used for Creating the Tempofy playists. 
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {storeData } from "./ExtraFunctions";
 import { Song } from './Classes';
-import { TempoInterval } from './TempoIntervalClass';
 import { SongHashTable } from './SongHashTable';
+import { newUser } from './ExtraFunctions';
 
 //Variables need for the Tempofy flow.
 export const newSongHashTable = new SongHashTable();
@@ -32,14 +31,16 @@ export async function getSongIDList(songListType){
 export async function fillHashTable(songListType) {
     //currentQueue is the variable to hold the queue/playlist and is pulled from AsyncStorage.  The accessToken is pulled as well. 
     const currentQueue = JSON.parse(await AsyncStorage.getItem(songListType));
-    const accessToken = await AsyncStorage.getItem("accessToken");
     //songIDList is created to be used in the getAudio-features API.
     var songIDList = await getSongIDList(songListType);
     //Get Audio-Features API call.
+    if(Date.now()  > newUser.getExpiresIn()){
+        refreshUserToken()
+     }
     fetch('https://api.spotify.com/v1/audio-features?ids=' + songIDList,  {
        method: "GET",
         headers: {
-          'Authorization': "Bearer " + accessToken,
+          'Authorization': "Bearer " + newUser.getAccessToken(),
         }
       })
       //currenntQueue is iterated through using a for loop.  The Song objects are created based off if they are from a queue or playlist.
@@ -79,9 +80,11 @@ export async function createTempofyPlaylist(playlistName, playlistDescription){
       
         })
     })
+    if(Date.now()  > newUser.getExpiresIn()){
+        refreshUserToken()
+     }
     //Retrieve the accessToken and the userID from Async Storage.  
     //May create user class later to store the userID for quicker access with asyncstorage.
-    const accessToken = await AsyncStorage.getItem("accessToken")
     let userID = await AsyncStorage.getItem("userID")
     var querystring = require('querystring');
     //Fetch to call Create Playlist API.  
@@ -89,7 +92,7 @@ export async function createTempofyPlaylist(playlistName, playlistDescription){
     fetch('https://api.spotify.com/v1/users/' + userID + '/playlists', {
         method: "POST",
         headers: {
-        'Authorization': "Bearer " + accessToken,
+        'Authorization': "Bearer " + newUser.getAccessToken(),
         'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -107,7 +110,7 @@ export async function createTempofyPlaylist(playlistName, playlistDescription){
         fetch("https://api.spotify.com/v1/playlists/" + playlistID + "/tracks?uris=" + playlistSongString, {
             method: "POST",
             headers: {
-            'Authorization': "Bearer " + accessToken,
+            'Authorization': "Bearer " + newUser.getAccessToken(),
             'Content-Type': 'application/json'
             }
         })
@@ -120,13 +123,15 @@ export async function createTempofyPlaylist(playlistName, playlistDescription){
 
 //Need to update function to check accessToken function and check error out if player isn't select. 
 //Function calls the Start/Resume Playback endpoint with the playlist uri to automatically play the playlist if a player is selected. 
-async function playTempofiedPlaylist(uri){
+ async function playTempofiedPlaylist(uri){
   const playerID = await AsyncStorage.getItem("player");
-  const accessToken = await AsyncStorage.getItem("accessToken")
+  if(Date.now()  > newUser.getExpiresIn()){
+    refreshUserToken()
+ }
           fetch("https://api.spotify.com/v1/me/player/play?device_id=" + playerID, {
             method: "PUT",
         headers: {
-          'Authorization': "Bearer " + accessToken,
+          'Authorization': "Bearer " + newUser.getAccessToken(),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({

@@ -1,5 +1,4 @@
-//Need to create check for retrieving the accessToken to make sure the token has not expired. 
-
+import { newUser } from "./ExtraFunctions";
 import  {Song}  from "./Classes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -66,11 +65,13 @@ export class SongHashTable {
             //Sets the amount of recommended Songs retrieved with the getRecommended API.
             const recommendedSongAmount = 30;
             //API call to the getRecommended endpoint.   
-            const accessToken = await AsyncStorage.getItem("accessToken")
+            if(Date.now()  > newUser.getExpiresIn()){
+                refreshUserToken()
+             }
             await fetch('https://api.spotify.com/v1/recommendations?limit='+ recommendedSongAmount +'&seed_tracks=' + recommendedSongIDString + '&min_tempo=' + minTempo + '&max_tempo=' + maxTempo + '&min_energy=' + minEnergyValue + '&max_energy=' + maxEnergyValue,{
                 method: "GET",
                 headers:  {
-                    'Authorization': "Bearer " + accessToken,
+                    'Authorization': "Bearer " + newUser.getAccessToken(),
                 }
             } )
             //JSON response is sent to a forloop to create a string of the song IDs for the getAudio-Features api. 
@@ -85,7 +86,7 @@ export class SongHashTable {
                 await fetch('https://api.spotify.com/v1/audio-features?ids=' + songIDString,  {
                     method: "GET",
                     headers: {
-                      'Authorization': "Bearer " + accessToken,
+                      'Authorization': "Bearer " + newUser.getAccessToken(),
                     }
                     })
                     //Response is senth through a for loop to create the Song Objects and insert them into the array at index in the hash table. 
