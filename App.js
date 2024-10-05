@@ -9,15 +9,15 @@ import {useAuthRequest } from 'expo-auth-session';
 import {StyleSheet, Button, View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { newUser } from './ExtraFunctions';
-import { authorize } from './LoginFunction';
+import { authorize } from './LoginFunctions';
 import { nextSong, startResumePlayback, pausePlayback, getTheUsersQueue } from './PlayerAPIs';
-import { search } from './SearchAPI';
+import { search } from './SearchAPIs';
 import { getPlaylistCoverImage } from './PlaylistsAPIs';
-import { getNewReleases } from './AlbumsAPIs';
+import { getNewReleases } from './AlbumAPIs';
 import { getArtistsRelatedArtists } from './ArtistsAPIs';
 import { getSingleBrowseCategories } from './CategoriesAPIs';
 import { getTracksAudioFeatures } from './TracksAPIs';
-import { getFollowedArtists } from './UsersAPIs';
+import { getFollowedArtists } from './UserAPIs';
 
 WebBrowser.maybeCompleteAuthSession();
 
