@@ -45,7 +45,7 @@ export function authorize(querystring, responseCode){
 }
 
 //Retrieves user info and gets player info right after login.
-const setUserInfo = () =>{
+const getUserInfo = () =>{
     fetch('https://api.spotify.com/v1/me', {
       method: "Get",
       headers: {

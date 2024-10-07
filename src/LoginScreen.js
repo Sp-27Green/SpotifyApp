@@ -4,6 +4,9 @@ import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { Buffer } from 'buffer';
 import { useNavigation } from '@react-navigation/native'; // Import navigation hook
+import { newUser } from '../ExtraFunctions';
+import { getUserInfo } from '../LoginFunctions';
+
 
 const discovery = {
   authorizationEndpoint: 'https://accounts.spotify.com/authorize',
@@ -60,6 +63,10 @@ export default function LoginScreen({ setIsLoggedIn }) {
       .then((response) => response.json())
       .then((responseJson) => {
         const token = responseJson.access_token;
+        newUser.setAccessToken(responseJson["access_token"])
+        newUser.setRefreshToken(responseJson["refresh_token"])
+        newUser.setExpiresIn(Date.now() + (responseJson["expires_in"] * 1000))
+        getUserInfo()
 
         if (token) {
           setAccessToken(token);

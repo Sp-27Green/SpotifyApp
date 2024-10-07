@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Modal, FlatList, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { nextSong } from '../PlayerAPIs';
 
 export default function PlayerScreen() {
   const [isPlaying, setIsPlaying] = useState(true);
@@ -8,6 +9,7 @@ export default function PlayerScreen() {
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
+    nextSong()
   };
 
   const handleNextSong = () => {
