@@ -1,7 +1,6 @@
 //Used for the Tracks Spotify APIs
 
 import { newUser } from './ExtraFunctions';
-
 //Retrieves the track based on the track ID, and returns the JSON. 
 export async function getTrack(trackID){
     if(Date.now()  > newUser.getExpiresIn()){

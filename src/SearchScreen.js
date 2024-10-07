@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function PlayerScreen() {
+export default function SearchScreen() {
   return (
     <View style={styles.container}>
-      <Text>Welcome to the Player Screen</Text>
+      <Text style={styles.text}>Search Screen</Text>
     </View>
   );
 }
@@ -12,7 +12,12 @@ export default function PlayerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1E1E1E',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  text: {
+    color: '#FFFFFF',
+    fontSize: 18,
   },
 });
