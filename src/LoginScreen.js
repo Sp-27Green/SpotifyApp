@@ -28,7 +28,7 @@ export default function LoginScreen({ setIsLoggedIn }) {
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: clientInfo.clientId,
-      scopes: ['user-read-email', 'user-read-private'],
+      scopes: ['user-follow-read, user-read-private, user-read-email, app-remote-control, streaming, user-read-playback-state, user-modify-playback-state, user-read-currently-playing, playlist-read-private, user-library-read, user-top-read'],
       redirectUri: makeRedirectUri({ scheme: 'tempoflow' }), // Adjust the scheme here as per your setup, I added URIs to my website
       usePKCE: true,
     },
