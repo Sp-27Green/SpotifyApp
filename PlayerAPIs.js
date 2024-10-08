@@ -4,240 +4,247 @@ import { storeData, newUser } from './ExtraFunctions';
 
 global.Buffer = require('buffer').Buffer;
 
-//Retrieves the the playback state of the player returns the JSON. 
-export async function getPlaybackState(){
-    if(Date.now()  > newUser.getExpiresIn()){
-        refreshUserToken()
+//Retrieves the playback state of the player and returns the JSON. 
+export async function getPlaybackState() {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
     }
-    var playbackState = "";
+
+    let playbackState = "";
     await fetch('https://api.spotify.com/v1/me/player', {
         method: "GET",
-        headers:  {
+        headers: {
             'Authorization': "Bearer " + newUser.getAccessToken(),
         }
     })
-    .then((response) =>  response.json())
-    .then((responseJson) => {
-      playbackState = responseJson
-    })
-    .catch((error) => {
-      console.error(error);
-    })
-    return playbackState
+        .then(response => response.json())
+        .then(responseJson => {
+            playbackState = responseJson;
+            console.log('Playback state:', responseJson); // Debugging info
+        })
+        .catch(error => {
+            console.error('Error fetching playback state:', error);
+        });
+
+    return playbackState;
 }
 
-//Function to calla GET API to retrieve devices.  Currently only retrieves the first device.
-//But we will add functionality later to choose device;
-export async function getPlayer(){
-    if(Date.now()  > newUser.getExpiresIn()){
-        refreshUserToken()
-     }
-    fetch('https://api.spotify.com/v1/me/player/devices', {
-      headers: {
-        'Authorization': "Bearer " + newUser.getAccessToken(),
-      }
+// Function to call a GET API to retrieve devices. Only retrieves the first device.
+export async function getPlayer() {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    await fetch('https://api.spotify.com/v1/me/player/devices', {
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+        }
     })
-    .then((response) =>  response.json())
-    .then((responseJson) => {
-      newUser.setCurrentPlayer(responseJson.devices[0].id);
-      storeData(newUser.getUserName(), JSON.stringify(newUser))
-      //need to send an alert if spotify device is not running. 
-    })
-    .catch((error) => {console.error(error); })
+        .then(response => response.json())
+        .then(responseJson => {
+            if (responseJson.devices && responseJson.devices.length > 0) {
+                const firstDevice = responseJson.devices[0];
+                if (firstDevice.id) {
+                    newUser.setCurrentPlayer(firstDevice.id);
+                    storeData(newUser.getUserName(), JSON.stringify(newUser));
+                } else {
+                    console.error('Device ID not found.');
+                }
+            } else {
+                console.error('No devices found.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching devices:', error);
+        });
 }
 
-  //Function to call a POST API to tell the player to go to the next song. 
+// Function to skip to the next song on the current player.
 export const nextSong = async () => {
-    if(Date.now()  > newUser.getExpiresIn()){
-       refreshUserToken()
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
     }
-    fetch('https://api.spotify.com/v1/me/player/next?device_id=' + newUser.getCurrentPlayer(), {
-      method: "POST",
-      headers: {
-        'Authorization': "Bearer " + newUser.getAccessToken(),
-      }  
-    })
-    .catch((error) => {console.error(error)})
-}
 
-//Retrieves the currently playing track of the player returns the JSON. 
-export async function getCurrentlyPlayingTrack(){
-    if(Date.now()  > newUser.getExpiresIn()){
-        refreshUserToken()
+    const currentPlayer = newUser.getCurrentPlayer();
+    if (currentPlayer) {
+        fetch('https://api.spotify.com/v1/me/player/next?device_id=' + currentPlayer, {
+            method: "POST",
+            headers: {
+                'Authorization': "Bearer " + newUser.getAccessToken(),
+            }
+        })
+            .catch(error => {
+                console.error('Error skipping to the next song:', error);
+            });
+    } else {
+        console.error('No current player device ID available.');
     }
-    var currentlyPlayingTrack = "";
+};
+
+// Retrieves the currently playing track and returns the JSON.
+export async function getCurrentlyPlayingTrack() {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    let currentlyPlayingTrack = "";
     await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
         method: "GET",
-        headers:  {
+        headers: {
             'Authorization': "Bearer " + newUser.getAccessToken(),
         }
     })
-    .then((response) =>  response.json())
-    .then((responseJson) => {
-      currentlyPlayingTrack = responseJson
-    })
-    .catch((error) => {
-      console.error(error);
-    })
-    return currentlyPlayingTrack
+        .then(response => response.json())
+        .then(responseJson => {
+            currentlyPlayingTrack = responseJson;
+            console.log('Currently playing track:', responseJson); // Debugging info
+        })
+        .catch(error => {
+            console.error('Error fetching currently playing track:', error);
+        });
+
+    return currentlyPlayingTrack;
 }
 
-//Starts playback based on the sent URI during the call. 
-export async function startResumePlayback(uri){
-  if(Date.now()  > newUser.getExpiresIn()){
-    refreshUserToken()
-  }
-  var bodyString = ""
-  //If no URI is sent. The playback is started from pause.
-  if( uri == null){
-    bodyString = {}
-  }
-  //If the 9th element of the uri is T, that means the uri is a track, and the body of the put will need "uris" in the body.
-  else if(uri[8] == "t"){
-    bodyString = {"uris": [uri], 
+// Starts or resumes playback based on the sent URI during the call. 
+export async function startResumePlayback(uri) {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
     }
-  }
-  //If uri is sent, but not a track, "contest_uri" is needed in the put body. 
-  else if( uri != null){
-    bodyString = {
-        "context_uri": uri
+
+    let bodyString = {};
+    if (uri && uri[8] === 't') {
+        // If the URI corresponds to a track, use the "uris" field
+        bodyString = { "uris": [uri] };
+    } else if (uri) {
+        // If the URI is a context, use "context_uri"
+        bodyString = { "context_uri": uri };
     }
-  }
-  fetch("https://api.spotify.com/v1/me/player/play?device_id=" + newUser.getCurrentPlayer(), {
-    method: "PUT",
-    headers: {
-      'Authorization': "Bearer " + newUser.getAccessToken(),
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(bodyString)
-  }) 
-  .then((response) =>  console.log(response))
-  .catch((error) => {
-    console.error(error);
-  })
+
+    fetch("https://api.spotify.com/v1/me/player/play?device_id=" + newUser.getCurrentPlayer(), {
+        method: "PUT",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bodyString)
+    })
+        .then(response => console.log('Playback started/resumed', response))
+        .catch(error => {
+            console.error('Error starting/resuming playback:', error);
+        });
 }
 
-//Pauses playback of the player. 
-export async function pausePlayback(){
-  if(Date.now()  > newUser.getExpiresIn()){
-    refreshUserToken()
-  }
-  fetch("https://api.spotify.com/v1/me/player/pause?device_id=" + newUser.getCurrentPlayer(), {
-    method: "PUT",
-    headers: {
-    'Authorization': "Bearer " + newUser.getAccessToken(),
-    'Content-Type': 'application/json'
-    },
-  }) 
-  .then((response) =>  console.log(response))      
-  .catch((error) => {
-    console.error(error);
-  })
+// Pauses playback of the player.
+export async function pausePlayback() {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    fetch("https://api.spotify.com/v1/me/player/pause?device_id=" + newUser.getCurrentPlayer(), {
+        method: "PUT",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(response => console.log('Playback paused', response))
+        .catch(error => {
+            console.error('Error pausing playback:', error);
+        });
 }
 
-//Put to set the position of the track based on ms time.
-export async function seekToPosition(time){
-  if(Date.now()  > newUser.getExpiresIn()){
-    refreshUserToken()
-  }
-  fetch("https://api.spotify.com/v1/me/player/seek?device_id=" + newUser.getCurrentPlayer() + "&position_ms=" + time , {
-    method: "PUT",
-    headers: {
-      'Authorization': "Bearer " + newUser.getAccessToken(),
-      'Content-Type': 'application/json'
-    },
-  }) 
-  .then((response) =>  console.log(response))
-  .catch((error) => {
-    console.error(error);
-  })
+// Sets the position of the track in milliseconds.
+export async function seekToPosition(time) {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    fetch("https://api.spotify.com/v1/me/player/seek?device_id=" + newUser.getCurrentPlayer() + "&position_ms=" + time, {
+        method: "PUT",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(response => console.log('Seeked to position', response))
+        .catch(error => {
+            console.error('Error seeking to position:', error);
+        });
 }
 
-//Sets player to previous song. 
+// Skips to the previous song on the player.
 export async function skipToPrevious() {
-  if(Date.now()  > newUser.getExpiresIn()){
-     refreshUserToken()
-  }
-  fetch('https://api.spotify.com/v1/me/player/previous?device_id=' + newUser.getCurrentPlayer(), {
-    method: "POST",
-    headers: {
-      'Authorization': "Bearer " + newUser.getAccessToken(),
-    }  
-  })
-  .catch((error) => {console.error(error)})
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    fetch('https://api.spotify.com/v1/me/player/previous?device_id=' + newUser.getCurrentPlayer(), {
+        method: "POST",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+        }
+    })
+        .catch(error => {
+            console.error('Error skipping to the previous song:', error);
+        });
 }
 
-//Put to set Repeat mode of the player. 
-//for context
-//'track' will repeate  the current track
-//'context' will repate the current context
-//'off' will turn repeat off
+// Sets the repeat mode of the player.
 export async function setRepeatMode(context) {
-  if(Date.now()  > newUser.getExpiresIn()){
-     refreshUserToken()
-  }
-  fetch('https://api.spotify.com/v1/me/player/repeat?device_id=' + newUser.getCurrentPlayer() + '&state=' + context, {
-    method: "PUT",
-    headers: {
-      'Authorization': "Bearer " + newUser.getAccessToken(),
-    }  
-  })
-  .catch((error) => {console.error(error)})
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    fetch('https://api.spotify.com/v1/me/player/repeat?device_id=' + newUser.getCurrentPlayer() + '&state=' + context, {
+        method: "PUT",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+        }
+    })
+        .catch(error => {
+            console.error('Error setting repeat mode:', error);
+        });
 }
 
-//Sets volume percentage of the player. 
-//Does not work with mobile. 
-//I do not suggest we try to use this.
-export async function setPlaybackVolume(volumePercent) {
-  if(Date.now()  > newUser.getExpiresIn()){
-     refreshUserToken()
-  }
-  fetch('https://api.spotify.com/v1/me/player/volume?device_id=' + newUser.getCurrentPlayer() + '&volume_percent=' + volumePercent, {
-    method: "PUT",
-    headers: {
-      'Authorization': "Bearer " + newUser.getAccessToken(),
-    }  
-  })
-  .catch((error) => {console.error(error)})
-}
-
-//Put to set the Shuffle on the player. 
-//for context
-//'true' shuffle user's playback
-//'false' Do not shuffle user's playback
+// Toggles playback shuffle on the player.
 export async function togglePlaybackShuffle(context) {
-  if(Date.now()  > newUser.getExpiresIn()){
-     refreshUserToken()
-  }
-  fetch('https://api.spotify.com/v1/me/player/shuffle?device_id=' + newUser.getCurrentPlayer() + '&state=' + context, {
-    method: "PUT",
-    headers: {
-      'Authorization': "Bearer " + newUser.getAccessToken(),
-    }  
-  })
-  .catch((error) => {console.error(error)})
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    fetch('https://api.spotify.com/v1/me/player/shuffle?device_id=' + newUser.getCurrentPlayer() + '&state=' + context, {
+        method: "PUT",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+        }
+    })
+        .catch(error => {
+            console.error('Error toggling playback shuffle:', error);
+        });
 }
 
-//Retrieves the User's current queue returns the JSON. 
-export async function getTheUsersQueue(){
-  if(Date.now()  > newUser.getExpiresIn()){
-      refreshUserToken()
-  }
-  await fetch('https://api.spotify.com/v1/me/player/queue', {
-      method: "GET",
-      headers:  {
-          'Authorization': "Bearer " + newUser.getAccessToken(),
-      }
-  })
-  .then((response) =>  response.json())
-  .then((responseJson) => {
-    usersQueue = responseJson
-  })
-  .catch((error) => {
-    console.error(error);
-  })
-  return usersQueue
+// Retrieves the user's current queue and returns the JSON.
+export async function getTheUsersQueue() {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    let usersQueue = "";
+    await fetch('https://api.spotify.com/v1/me/player/queue', {
+        method: "GET",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+        }
+    })
+        .then(response => response.json())
+        .then(responseJson => {
+            usersQueue = responseJson;
+            console.log('User queue:', responseJson); // Debugging info
+        })
+        .catch(error => {
+            console.error('Error fetching user queue:', error);
+        });
+
+    return usersQueue;
 }
-
-
-

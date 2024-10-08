@@ -1,49 +1,52 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Modal, FlatList, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { nextSong } from '../PlayerAPIs';
+import { getCurrentlyPlayingTrack, pausePlayback, nextSong, skipToPrevious } from '../PlayerAPIs'; // Import APIs
 
 export default function PlayerScreen() {
   const [isPlaying, setIsPlaying] = useState(true);
+  const [currentTrack, setCurrentTrack] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);  // State to control modal(queue sheet) visibility
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-    nextSong()
+  useEffect(() => {
+    fetchCurrentlyPlaying();
+  }, []);
+
+  const fetchCurrentlyPlaying = async () => {
+    const track = await getCurrentlyPlayingTrack(); // Fetch currently playing track from Spotify
+    if (track && track.item) {
+      setCurrentTrack(track.item); // Set track information
+      setIsPlaying(!track.is_playing); // Update play/pause state based on Spotify
+    }
   };
 
-  const handleNextSong = () => {
-    console.log("Next song");
+  const handlePlayPause = async () => {
+    if (isPlaying) {
+      await pausePlayback(); // Pause playback
+    } else {
+      await nextSong(); // Resume playback
+    }
+    setIsPlaying(!isPlaying); // Toggle play/pause state
+  };
+
+  const handleNextSong = async () => {
+    await nextSong(); // Skip to next track
+    fetchCurrentlyPlaying(); // Fetch new track info after skipping
+  };
+
+  const handlePreviousSong = async () => {
+    await skipToPrevious(); // Go back to previous track
+    fetchCurrentlyPlaying(); // Fetch new track info after skipping back
   };
 
   const handleToggleModal = () => {
     setIsModalVisible(!isModalVisible);  // Toggle modal visibility
   };
 
-  const albumCoverUrl = 'https://vanderbilthustler.com/wp-content/uploads/2023/02/VH-Album-Covers-1.png';  // Album cover I found online
-
   // Example playlist data (20 artificial songs just so I can have enough songs to scroll through the queue/playlist queue)
   const playlist = [
     { title: 'Song 1', artist: 'Artist 1', album: 'Album 1' },
-    { title: 'Song 2', artist: 'Artist 2', album: 'Album 2' },
-    { title: 'Song 3', artist: 'Artist 3', album: 'Album 3' },
-    { title: 'Song 4', artist: 'Artist 4', album: 'Album 4' },
-    { title: 'Song 5', artist: 'Artist 5', album: 'Album 5' },
-    { title: 'Song 6', artist: 'Artist 6', album: 'Album 6' },
-    { title: 'Song 7', artist: 'Artist 7', album: 'Album 7' },
-    { title: 'Song 8', artist: 'Artist 8', album: 'Album 8' },
-    { title: 'Song 9', artist: 'Artist 9', album: 'Album 9' },
-    { title: 'Song 10', artist: 'Artist 10', album: 'Album 10' },
-    { title: 'Song 11', artist: 'Artist 11', album: 'Album 11' },
-    { title: 'Song 12', artist: 'Artist 12', album: 'Album 12' },
-    { title: 'Song 13', artist: 'Artist 13', album: 'Album 13' },
-    { title: 'Song 14', artist: 'Artist 14', album: 'Album 14' },
-    { title: 'Song 15', artist: 'Artist 15', album: 'Album 15' },
-    { title: 'Song 16', artist: 'Artist 16', album: 'Album 16' },
-    { title: 'Song 17', artist: 'Artist 17', album: 'Album 17' },
-    { title: 'Song 18', artist: 'Artist 18', album: 'Album 18' },
-    { title: 'Song 19', artist: 'Artist 19', album: 'Album 19' },
-    { title: 'Song 20', artist: 'Artist 20', album: 'Album 20' },
+    // ... more songs
   ];
 
   // Function to render each item in the queue
@@ -57,18 +60,21 @@ export default function PlayerScreen() {
     <View style={styles.container}>
       <Text style={styles.welcomeText}>Now Playing</Text>
 
-      <Image
-        source={{ uri: albumCoverUrl }}
-        style={styles.albumArt}
-        onError={(e) => console.error('Failed to load album cover', e.nativeEvent.error)}
-      />
-
-      <Text style={styles.trackTitle}>Track Title</Text>
-      <Text style={styles.trackArtist}>Artist Name</Text>
+      {currentTrack && (
+        <View>
+          <Image
+            source={{ uri: currentTrack.album.images[0].url }}
+            style={styles.albumArt}
+            onError={(e) => console.error('Failed to load album cover', e.nativeEvent.error)}
+          />
+          <Text style={styles.trackTitle}>{currentTrack.name}</Text>
+          <Text style={styles.trackArtist}>{currentTrack.artists.map(artist => artist.name).join(', ')}</Text>
+        </View>
+      )}
 
       {/* Playback Controls */}
       <View style={styles.controls}>
-        <TouchableOpacity onPress={handleNextSong}>
+        <TouchableOpacity onPress={handlePreviousSong}>
           <Ionicons name="play-skip-back" size={48} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={handlePlayPause}>

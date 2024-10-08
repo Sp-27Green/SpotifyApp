@@ -3,10 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { Buffer } from 'buffer';
-import { useNavigation } from '@react-navigation/native'; // Import navigation hook
+import { useNavigation } from '@react-navigation/native';
 import { newUser } from '../ExtraFunctions';
 import { getUserInfo } from '../LoginFunctions';
-
 
 const discovery = {
   authorizationEndpoint: 'https://accounts.spotify.com/authorize',
@@ -14,8 +13,8 @@ const discovery = {
 };
 
 const clientInfo = {
-  clientId: '63f3a6f0286e4f7a9e2c30ac0f90ea49', // Change your clientId. this is mine
-  clientSecret: '13fb075c2ff549e6aa9f0d85e77b1476', // Change your clientSecret. this is also mine
+  clientId: '63f3a6f0286e4f7a9e2c30ac0f90ea49', // Your clientId
+  clientSecret: '13fb075c2ff549e6aa9f0d85e77b1476', // Your clientSecret
 };
 
 WebBrowser.maybeCompleteAuthSession();
@@ -24,15 +23,15 @@ export default function LoginScreen({ setIsLoggedIn }) {
   const [loading, setLoading] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  const [myState, setState] = useState("Not logged in");
+  const [myState, setState] = useState('Not logged in');
 
-  const navigation = useNavigation(); // Initialize the navigation
+  const navigation = useNavigation();
 
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: clientInfo.clientId,
-      scopes: ['user-follow-read, user-read-private, user-read-email, app-remote-control, streaming, user-read-playback-state, user-modify-playback-state, user-read-currently-playing, playlist-read-private, user-library-read, user-top-read'],
-      redirectUri: makeRedirectUri({ scheme: 'tempoflow' }), // Adjust the scheme here as per your setup, I added URIs to my website
+      scopes: ['user-read-email', 'user-read-private', 'user-modify-playback-state', 'user-read-playback-state', 'app-remote-control'],
+      redirectUri: 'exp://192.168.1.12:8081',
       usePKCE: true,
     },
     discovery
@@ -63,14 +62,14 @@ export default function LoginScreen({ setIsLoggedIn }) {
       .then((response) => response.json())
       .then((responseJson) => {
         const token = responseJson.access_token;
-        newUser.setAccessToken(responseJson["access_token"])
-        newUser.setRefreshToken(responseJson["refresh_token"])
-        newUser.setExpiresIn(Date.now() + (responseJson["expires_in"] * 1000))
-        getUserInfo()
+        newUser.setAccessToken(responseJson.access_token);
+        newUser.setRefreshToken(responseJson.refresh_token);
+        newUser.setExpiresIn(Date.now() + responseJson.expires_in * 1000);
+        getUserInfo(); // Fetch user info after getting the token
 
         if (token) {
           setAccessToken(token);
-          fetchUserProfile(token); // Fetch user profile after getting the token
+          fetchUserProfile(token);
         } else {
           console.error('No access token found in response:', responseJson);
         }
@@ -92,8 +91,6 @@ export default function LoginScreen({ setIsLoggedIn }) {
       .then((data) => {
         setUserInfo(data);
         setState('Logged in as: ' + data.display_name);
-
-        // Set login state to true
         setIsLoggedIn(true);
       })
       .catch((error) => {
@@ -102,7 +99,6 @@ export default function LoginScreen({ setIsLoggedIn }) {
       .finally(() => setLoading(false));
   };
 
-  // Monitor the response from the OAuth request
   useEffect(() => {
     if (response?.type === 'success') {
       const { code } = response.params;
