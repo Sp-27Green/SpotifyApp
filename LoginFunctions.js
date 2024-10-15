@@ -56,6 +56,7 @@ export const getUserInfo = () => {
     .then((response) => response.json())
     .then((responseJson) => {
       newUser.setUserName(responseJson['display_name']);
+      newUser.setUserID(responseJson["id"])
       getPlayer();
     })
     .catch((error) => {

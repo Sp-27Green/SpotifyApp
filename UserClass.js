@@ -1,18 +1,27 @@
 //Used to hold the current user's info. Looking for a possible better way of doing this since its unencrypted. 
 
-export class user{
+export class User{
     constructor(){
-        var userName = "";
-        var accessToken = "";
-        var refreshToken = "";
-        var expiresIn = 0;
-        var currentPlayer = "";
+        this.userName = "";
+        this.userID = "";
+        this.accessToken = "";
+        this.refreshToken = "";
+        this.expiresIn = 0;
+        this.currentPlayer = "";
+        this.usersIntervalTemplates = [];
+        this.tempoInterval  = []
+    
     }
 
     //Getters and Setters
     getUserName(){
         return this.userName;
     }
+
+    getUserID(){
+        return this.userID;
+    }
+
 
     getAccessToken(){
         return this.accessToken;
@@ -32,6 +41,9 @@ export class user{
 
     setUserName(userName){
         this.userName = userName;
+    }
+    setUserID(userID){
+        this.userID = userID;
     }
 
     setAccessToken(accessToken){

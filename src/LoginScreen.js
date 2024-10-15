@@ -30,7 +30,7 @@ export default function LoginScreen({ setIsLoggedIn }) {
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: clientInfo.clientId,
-      scopes: ['user-read-email', 'user-read-private', 'user-modify-playback-state', 'user-read-playback-state', 'app-remote-control'],
+      scopes: ['user-follow-read, user-read-private, user-read-email, app-remote-control, streaming, user-read-playback-state, user-modify-playback-state, user-read-currently-playing, playlist-read-private, playlist-modify-public, playlist-modify-private, user-library-read, user-top-read'],
       redirectUri: 'exp://192.168.1.12:8081',
       usePKCE: true,
     },

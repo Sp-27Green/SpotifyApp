@@ -6,6 +6,8 @@ import PlayerScreen from './src/PlayerScreen';  // Import the Player screen
 import SearchScreen from './src/SearchScreen';  // Import the Search screen
 import PlaylistScreen from './src/PlaylistScreen';  // Import the Playlist screen
 import LoginScreen from './src/LoginScreen';  // Import the Login screen
+import { TemplateScreen } from './src/TemplateScreen';
+import { TempofyScreen } from './src/TempofyScreen';
 import { Ionicons } from '@expo/vector-icons'; // For tab icons
 
 const Tab = createBottomTabNavigator();
@@ -62,6 +64,8 @@ export default function App() {
             {props => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
           </Stack.Screen>
         )}
+        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="Playlist" component={PlaylistScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

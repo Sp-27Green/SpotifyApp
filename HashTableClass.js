@@ -1,17 +1,21 @@
 import { newUser } from "./ExtraFunctions";
-import  {Song}  from "./Classes";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import  {Song}  from "./SongClass";
 
 
 //Hash Table class. Each element holds an array of Songs for a specific tempo range. 
-export class SongHashTable {
+export class SongHashTable{
     constructor() {
         this.hashTable = [];
+        //Secondary hash table that holds the index of the last song in that hashTable index that is going to be used for the Tempofy Playlist Queue. 
+        this.songIndexCount = [];
         //Array holds 5 songs at a time.  The data from the songs will be used to run the getRecommened API to retrieve more songs. 
         this.songRecommenedList = [];
-        //For loop to create an array in each element.
+        this.songReferenceAmount = 0;
+        //For loop to create an array in each element and sets the sondIndexCount for each index to 0; 
+        
         for(var i = 0; i < 100; i++ ){
             this.hashTable.push([]);
+            this.songIndexCount[i] = 0 ;
         }
     }
 
@@ -23,13 +27,14 @@ export class SongHashTable {
     //Method to insert Song into Hash Table. 
     insertSong(song, key){
         //Check to see if the songRecommendedList is less than 5, since the getRecommended API will only take in 5 song IDs. Push Song object to the array.
-        if(this.songRecommenedList.length < 5){
+        if(this.songReferenceAmount < 5){
             this.songRecommenedList.push(song);
+            this.songReferenceAmount++;
         }
         //If the songRecommendedList is 5 or greater, pushes Song object to the back of the array and shifts(pops) the front of the array. 
         else{
-            this.songRecommenedList.push(song);
-            this.songRecommenedList.shift();
+            this.songRecommenedList.splice(3,0,song);
+            this.songRecommenedList.pop();
         }
         //Checks key and pushes the Song object to the correct index of the Hash Table. 
         const index = this._setKey(key);
@@ -41,9 +46,11 @@ export class SongHashTable {
     //Get Song method takes in tempo as the key.  Then retrieves Song object within that index to match the tempo range. 
     async getSong(key){
         const index = this._setKey(key);
-        //If the array at the index is not empty, the Song Object at the beginning of the array is shifted(popped) and returned. 
-        if(this.hashTable[index].length > 0){
-            var song = this.hashTable[index].shift();
+        //If the array tables length is larger then the current count for the array in the songIndexCount, 
+        //Copy song and return song,  and also up the count in songIndexCount +1 for that index. 
+        if(this.hashTable[index].length > this.songIndexCount[index]){
+            var song = this.hashTable[index][this.songIndexCount[index]];
+            this.songIndexCount[index] = this.songIndexCount[index] + 1;
             return song;
         }
         //Else if the Array is empty at the index, the songRecommendList is used to run the getRecommend API to retrieve more songs. 
@@ -67,7 +74,7 @@ export class SongHashTable {
             //API call to the getRecommended endpoint.   
             if(Date.now()  > newUser.getExpiresIn()){
                 refreshUserToken()
-             }
+            }
             await fetch('https://api.spotify.com/v1/recommendations?limit='+ recommendedSongAmount +'&seed_tracks=' + recommendedSongIDString + '&min_tempo=' + minTempo + '&max_tempo=' + maxTempo + '&min_energy=' + minEnergyValue + '&max_energy=' + maxEnergyValue,{
                 method: "GET",
                 headers:  {
@@ -83,6 +90,9 @@ export class SongHashTable {
                     songIDString = songIDString + element.id + ",";
                 })
                 //API call to the getAudio-Features endpoingt.  
+                if(Date.now()  > newUser.getExpiresIn()){
+                    refreshUserToken()
+                }
                 await fetch('https://api.spotify.com/v1/audio-features?ids=' + songIDString,  {
                     method: "GET",
                     headers: {
@@ -94,12 +104,14 @@ export class SongHashTable {
                     .then((responseJson) => { 
                         for(var i = 0; i < responseJson.audio_features.length; i++){
                         const newSong = new Song(newSongs[i].id, newSongs[i].artists[0].name, newSongs[i].name, newSongs[i].album.images[2].url,responseJson.audio_features[i].tempo,responseJson.audio_features[i].energy);
-                        this.hashTable[index].push(newSong);
+                        this.insertSong(newSong,responseJson.audio_features[i].tempo);
                         }
                     })           
             })
-            //Song is shifted from the array and returned. 
-            song = await this.hashTable[index].shift();
+            //Song object from the index is returned. 
+            //The songIndexCount for that index is incremented. 
+            var song = await this.hashTable[index][this.songIndexCount[index]];
+            this.songIndexCount[index] = this.songIndexCount[index] + 1;
             return song; 
         }
     }
@@ -119,5 +131,13 @@ export class SongHashTable {
             console.log(JSON.stringify(element));
             index++;
         })
+    }
+
+    //Reseets the songIndexCount in all indices to zero.  So a new playlist or queue can be inserted. 
+    resetCount(){
+        for(var i = 0; i < 100; i++ ){
+            this.songIndexCount[i] = 0 ;
+        }
+        
     }
 }

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getCurrentlyPlayingTrack, pausePlayback, nextSong, skipToPrevious } from '../PlayerAPIs'; // Import APIs
-
+import { useNavigation } from '@react-navigation/native';
 export default function PlayerScreen() {
+  const navigation = useNavigation()
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);  // State to control modal(queue sheet) visibility
@@ -86,7 +87,12 @@ export default function PlayerScreen() {
       </View>
 
       {/* Tempofy Button */}
-      <TouchableOpacity style={styles.tempofyButton}>
+      <TouchableOpacity style={styles.tempofyButton}
+        onPress={()=> {
+          let playlistID = "queue"
+          navigation.navigate("Tempofy",  {playlistID: playlistID})
+        }}
+      >
         <Text style={styles.tempofyButtonText}>Tempofy</Text>
       </TouchableOpacity>
 
