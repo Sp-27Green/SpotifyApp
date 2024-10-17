@@ -38,9 +38,9 @@ export default function TempofyListItem({ item, onDelete }) {
             }}
         >
             <View style={styles.item} {...panResponder.panHandlers}>
-                <Text>{item.songTitle}</Text>
-                <Text>{item.artist}</Text>
-                <Text>{item.tempo}</Text>
+                <Text style={styles.text}>{item.songTitle}</Text>
+                <Text style={styles.text}>{item.artist}</Text>
+                <Text style={styles.text}>{item.tempo}</Text>
                 <Image source = {{uri: item.albumImage}} style = {{ width: 50, height: 50 }}/>
             </View>
             <TouchableOpacity
@@ -60,6 +60,9 @@ item: {
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+},
+text:{
+    color: "white"
 },
 itemContainer: {
     width: 400,
