@@ -8,7 +8,7 @@ WebBrowser.maybeCompleteAuthSession();
 const discovery = {
   authorizationEndpoint: 'https://accounts.spotify.com/authorize',
   tokenEndpoint: 'https://accounts.spotify.com/api/token',
-  redirectUri: 'exp://192.168.1.12:8081',
+  redirectUri: 'exp://192.168.1.7:8081'
 };
 
 // Add your client ID and secret from Spotify developers

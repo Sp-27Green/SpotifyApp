@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import PlayerScreen from './src/PlayerScreen';  // Import the Player screen
-import SearchScreen from './src/SearchScreen';  // Import the Search screen
-import PlaylistScreen from './src/PlaylistScreen';  // Import the Playlist screen
-import LoginScreen from './src/LoginScreen';  // Import the Login screen
-import { TemplateScreen } from './src/TemplateScreen';
-import { TempofyScreen } from './src/TempofyScreen';
-import { Ionicons } from '@expo/vector-icons'; // For tab icons
+import PlayerScreen from './src/PlayerScreen';  
+import SearchScreen from './src/SearchScreen';  
+import TempofyScreen from './src/TempofyScreen';
+import TemplateScreen from './src/TemplateScreen';
+import PlaylistScreen from './src/PlaylistScreen';  
+import LoginScreen from './src/LoginScreen';  
+import { Ionicons } from '@expo/vector-icons'; 
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track if the user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Tracks if the user is logged in
 
-  // Tab Navigator for the player, search, and playlist screens
+  // Tab Navigator for the player, search, playlist, and tempofy screens
   const TabNavigator = () => (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -29,6 +29,8 @@ export default function App() {
             iconName = 'search';
           } else if (route.name === 'Playlist') {
             iconName = 'list';
+          } else if (route.name === 'Tempofy') {
+            iconName = 'timer-outline'; // Change icon as needed
           }
 
           // Return the appropriate icon
@@ -42,6 +44,9 @@ export default function App() {
       <Tab.Screen name="Player" component={PlayerScreen} />
       <Tab.Screen name="Search" component={SearchScreen} />
       <Tab.Screen name="Playlist" component={PlaylistScreen} />
+      <Tab.Screen name="Tempofy" component={TempofyScreen} />
+      <Tab.Screen name="Template" component={TemplateScreen} />
+
     </Tab.Navigator>
   );
 
@@ -64,8 +69,6 @@ export default function App() {
             {props => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
           </Stack.Screen>
         )}
-        <Tab.Screen name="Search" component={SearchScreen} />
-        <Tab.Screen name="Playlist" component={PlaylistScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

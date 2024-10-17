@@ -1,158 +1,158 @@
 import { useEffect, useState } from 'react';
-import {StyleSheet, Button, View, SafeAreaView, TextInput, FlatList} from 'react-native';
+import { StyleSheet, View, TextInput, FlatList, TouchableOpacity, Text, SafeAreaView } from 'react-native';
 import { StatusBar } from "expo-status-bar";
-import React  from 'react';
+import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import {  newUser, intervalList } from '../ExtraFunctions';
+import { newUser, intervalList } from '../ExtraFunctions';
 import { TempoInterval } from '../TempoIntervalClass';
 import { TempoIntervalTemplate } from '../TempoIntervalTemplateClass';
-import TemplateListItem from "../TemplateListItems.js"
+import TemplateListItem from "../TemplateListItems.js";
 
-var flatListArray = [];
-
-export const TemplateScreen = ({ route }) => { 
-    const {value} = route.params;
+export const TemplateScreen = ({ route }) => {
+    const { value } = route.params;
     const navigation = useNavigation();
-    const [data, setData] = useState(flatListArray);
-  
-    if(value != -1 && value != "null"){
+    const [data, setData] = useState([]);
+    let interval, intervalName = 'Enter Interval Template Name', intervalArray;
+
+    // Set interval information if value exists
+    if (value !== -1 && value !== "null") {
         interval = newUser.usersIntervalTemplates[value];
         intervalName = interval.getTemplateName();
         intervalArray = interval.intervalArray;
     }
-    else{
-        intervalName = 'Enter Interval Template Name';
-    }
+
     const [text, onChangeText] = useState(intervalName);
 
+    // Runs when the component is first mounted
     useEffect(() => {
         intervalList.length = 0;
-        flatListArray.length = 0;
-        if(value != -1 && value != "null"){
-            for(var i = 0; i < intervalArray.length; i++){
-                const newId =  (i + 1).toString();
-                var newItem =  { id:  newId, text:  `Item ${newId}`, userTemplate:  value, lowTempo:  intervalArray[i].lowTempo, highTempo:   intervalArray[i].highTempo, interval:  intervalArray[i].getIntervalType(), songAmount:  intervalArray[i].getSongAmount() };
-                intervalList.push(intervalArray[i]);
-                data.push(newItem);
-            }
+        if (intervalArray) {
+            const list = intervalArray.map((item, i) => ({
+                id: (i + 1).toString(),
+                text: `Item ${(i + 1)}`,
+                userTemplate: value,
+                lowTempo: item.lowTempo,
+                highTempo: item.highTempo,
+                interval: item.getIntervalType(),
+                songAmount: item.getSongAmount()
+            }));
+            setData(list);
+            intervalList.push(...intervalArray);
         }
-        setData([...data]);
-    }, [])
+    }, []);
 
     const handleDeleteItem = (id) => {
-        const updatedData = data.filter((item) => item.id !== id);
-        if(data.length > 0){
-            for(var i = 0; i < data.length; i++){
-                var newId = (i + 1).toString();
-                data[i].id = newId;
-                data[i].text = `Item ${newId}`;
-            }
-        }
-        setData(updatedData);
+        const updatedData = data.filter(item => item.id !== id);
+        const updatedList = updatedData.map((item, index) => ({
+            ...item,
+            id: (index + 1).toString(),
+            text: `Item ${index + 1}`,
+        }));
+        setData(updatedList);
     };
-
-    const renderItem = ({ item }) => (
-        <TemplateListItem item={item} onDelete={handleDeleteItem}  />
-    );
 
     const handleAddItem = () => {
-        const newId = data.length + 1
-        const newItem = { id: newId, text: "Item " + newId, userTemplate:  value, lowTempo:  80, highTempo:  80, interval:  "increase", songAmount:  1 };
-        newInterval = new TempoInterval()
-        intervalList.push(newInterval)
-        setData([...data, newItem]); 
+        const newId = (data.length + 1).toString();
+        const newItem = { id: newId, text: `Item ${newId}`, userTemplate: value, lowTempo: 80, highTempo: 80, interval: "increase", songAmount: 1 };
+        const newInterval = new TempoInterval();
+        intervalList.push(newInterval);
+        setData([...data, newItem]);
     };
-  
-    const handleSave = (item) => {
-        var tempoTemplate = new TempoIntervalTemplate(text);
-        if(value == "null" || value == -1){
+
+    const handleSave = () => {
+        const tempoTemplate = new TempoIntervalTemplate(text);
+        if (value === "null" || value === -1) {
             newUser.usersIntervalTemplates.push(tempoTemplate);
             Object.assign(newUser.usersIntervalTemplates[newUser.usersIntervalTemplates.length - 1].intervalArray, intervalList);
-        }
-        else {
+        } else {
             newUser.usersIntervalTemplates[value].setTemplateName(text);
             Object.assign(newUser.usersIntervalTemplates[value].intervalArray, intervalList);
         }
-        navigation.pop();
+        navigation.goBack();
     };
-  
+
+    const renderItem = ({ item }) => (
+        <TemplateListItem item={item} onDelete={handleDeleteItem} />
+    );
+
     return (
-        <SafeAreaView style=
-            {[
-            styles.container,
-                {
-                    flexDirection: 'column',
-                },
-            ]}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.top}>
                 <TextInput
                     style={styles.input}
                     onChangeText={onChangeText}
                     value={text}
+                    placeholder="Enter Template Name"
+                    placeholderTextColor="#888"
                 />
-                    <Button
-                        title = "Add interval"
-                        onPress={handleAddItem}
-                    />
+                <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
+                    <Text style={styles.addButtonText}>Add Interval</Text>
+                </TouchableOpacity>
             </View>
             <FlatList
                 style={styles.list}
                 data={data}
                 renderItem={renderItem}
-                keyExtractor={(item) => item.id}
+                keyExtractor={item => item.id}
             />
-            <StatusBar style="auto" />
             <View style={styles.bottom}>
-                <Button 
-                title = "Save"
-                onPress={handleSave}
-                />
-                  
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <Text style={styles.saveButtonText}>Save</Text>
+                </TouchableOpacity>
             </View>
+            <StatusBar style="auto" />
         </SafeAreaView>
-    
     );
 };
 
 const styles = StyleSheet.create({
-    input: {
-        height: 40,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-    },
-    scrollView: {
-        backgroundColor: 'white',
-    
-    },
-    top:{
-        backgroundColor: '#bfc0c6',
-    },
-    bottom:{
-        backgroundColor: '#bfc0c6',
-    }, 
-    container:{
+    container: {
         flex: 1,
+        backgroundColor: '#1E1E1E',
         padding: 20,
     },
-    item: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 30,
-        margin: 2,
-        borderColor: '#2a4944',
+    top: {
+        marginBottom: 20,
+    },
+    input: {
+        height: 50,
+        borderColor: '#555',
         borderWidth: 1,
-        backgroundColor: '#d2f7f1'
+        borderRadius: 8,
+        padding: 10,
+        color: '#fff',
+        backgroundColor: '#2C2C2C',
+        marginBottom: 20,
+    },
+    addButton: {
+        backgroundColor: '#1DB954',
+        paddingVertical: 15,
+        borderRadius: 30,
+        alignItems: 'center',
+    },
+    addButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     list: {
-        alignSelf: "stretch",
+        flex: 1,
+    },
+    bottom: {
+        marginBottom: 20,
+        alignItems: 'center',
+    },
+    saveButton: {
+        backgroundColor: '#1DB954',
+        paddingVertical: 15,
+        paddingHorizontal: 60,
+        borderRadius: 30,
+    },
+    saveButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
-
-
-  
-  
-  
-  
+export default TemplateScreen;
