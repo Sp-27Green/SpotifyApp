@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { PureComponent, useEffect, useState } from 'react';
 import {StyleSheet, Button, View, Text, SafeAreaView, TextInput, FlatList} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
@@ -14,7 +14,7 @@ import TempofyListItem from '../TempofyListItem';
 //navigation.navigate("Tempofy",  {value: playlistID})
 //where playlistID is the the id for the playlist in Spotify, example: "6vlXUJKBK4DKYLXMP4Xk3s"
 //or playlist id is "queue" for pulling the queue from the player page.
-export function TempofyScreen({ route }) {
+export function TempofyScreen({ route })  {
     //Sets the Interval Picker List to a blank array on load. So we can update it with the list of the user's Interval Templates.
     let intervalPickerList = [];
     let flatListArray = [];
@@ -52,6 +52,11 @@ export function TempofyScreen({ route }) {
             renderList()
         }, 1000);
     });
+
+    //Creates the Hashtable on load. 
+    useEffect(() => {
+        startHashTable(playlistID)
+    }, [])
 
     //Function is used to replace song in the queue.
     //ID is used from the list to find the correct index of the queue.
@@ -97,8 +102,8 @@ export function TempofyScreen({ route }) {
     }
 
     //Handles the start of the tempofy flow.  This will pull the songs needed into the Tempofy queue. 
-    const  handleTempofy =  async  () => {
-        const tempofyListResult = await  tempofyList(newUser.usersIntervalTemplates[pickerState - 1].intervalArray);
+    const  handleTempofy =  async  (value) => {
+        const tempofyListResult = await  tempofyList(newUser.usersIntervalTemplates[value - 1].intervalArray);
     }
   
 
@@ -127,7 +132,7 @@ export function TempofyScreen({ route }) {
                             }
                             else if(value >= 1){
                                 setEditButton("Edit Interval Set")
-                                startHashTable(playlistID)
+                                handleTempofy(value)
                             }
                         }}
                         items={
@@ -147,28 +152,16 @@ export function TempofyScreen({ route }) {
                     }
                 }}
                 />
-                <Button
-                    title = "Tempofy"
-                    onPress={async () => {
-                        if(pickerState == 'create'){
-                            navigation.navigate("Template")
-                        }
-                        else if(pickerState == 'null' || pickerState == " "){
-                        //do nothing
-                        }
-                        else{
-                            handleTempofy();
-                        }
-                    }}
-                />
+                
             </View>
-            
+            <View style={{flex:1}}>
             <FlatList
                 style={styles.list}
                 data={data}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
             />
+            </View>
             <StatusBar style="auto" />
             <View style={styles.bottom}>
                     <Button 
