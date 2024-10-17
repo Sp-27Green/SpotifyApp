@@ -9,7 +9,13 @@ import { tempofyQueue, newUser } from '../ExtraFunctions';
 import { newSongHashTable } from '../TempoFunctions';
 import TempofyListItem from '../TempofyLIstItem';
 
+//navigation to Tempofy page, 
+//the call must look like this 
+//navigation.navigate("Tempofy",  {value: playlistID})
+//where playlistID is the the id for the playlist in Spotify, example: "6vlXUJKBK4DKYLXMP4Xk3s"
+//or playlist id is "queue" for pulling the queue from the player page.
 export function TempofyScreen({ route }) {
+    //Sets the Interval Picker List to a blank array on load. So we can update it with the list of the user's Interval Templates.
     let intervalPickerList = [];
     let flatListArray = [];
     const navigation = useNavigation();
@@ -39,6 +45,11 @@ export function TempofyScreen({ route }) {
             renderList()
         }, 1000);
     });
+
+    //Creates the Hashtable on load. 
+    useEffect(() => {
+        startHashTable(playlistID)
+    }, [])
 
     // Replace a song in the queue by its ID
     const handleReplaceSong = async (id) => {
@@ -72,10 +83,11 @@ export function TempofyScreen({ route }) {
         setData([...data]);
     }
 
-    // Start the Tempofy flow
-    const handleTempofy = async () => {
-        await tempofyList(newUser.usersIntervalTemplates[pickerState - 1].intervalArray);
-    };
+    //Handles the start of the tempofy flow.  This will pull the songs needed into the Tempofy queue. 
+    const  handleTempofy =  async  () => {
+        const tempofyListResult = await  tempofyList(newUser.usersIntervalTemplates[pickerState - 1].intervalArray);
+    }
+  
 
     return (
         <SafeAreaView style={styles.container}>
@@ -90,32 +102,55 @@ export function TempofyScreen({ route }) {
                 <View style={styles.dropdownContainer}>
                     <Text style={styles.label}>Interval Type:</Text>
                     <RNPickerSelect
-                        onValueChange={async (value) => {
-                            setPickerState(value);
-                            if (value === 'null') {
-                                setEditButton("Create new Interval Set");
-                            } else if (value >= 1) {
-                                setEditButton("Edit Interval Set");
-                                startHashTable(playlistID);
+                        onValueChange={ async (value) => {
+                            setPickerState(value)
+                            templateIndex = value;
+                            if(value == 'null'){
+                                setEditButton("Create new Interval Set")
+                            }
+                            else if(value >= 1){
+                                setEditButton("Edit Interval Set")
+                                startHashTable(playlistID)
                             }
                         }}
                         items={intervalDropdownState}
                         style={pickerSelectStyles}
                     />
                 </View>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Template", { value: pickerState >= 0 ? pickerState - 1 : pickerState })}>
-                    <Text style={styles.buttonText}>{editButton}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleTempofy}>
-                    <Text style={styles.buttonText}>Tempofy</Text>
-                </TouchableOpacity>
+                <Button
+                title = {editButton}
+                onPress={async () => {
+                    if( pickerState >= 0 && pickerState != "null"){
+                        navigation.navigate("Template",  {value: pickerState - 1})
+                    }
+                    else {
+                        navigation.navigate("Template",  {value: pickerState})
+                    }
+                }}
+                />
+                <Button
+                    title = "Tempofy"
+                    onPress={async () => {
+                        if(pickerState == 'create'){
+                            navigation.navigate("Template")
+                        }
+                        else if(pickerState == 'null' || pickerState == " "){
+                        //do nothing
+                        }
+                        else{
+                            handleTempofy();
+                        }
+                    }}
+                />
             </View>
+            
             <FlatList
                 style={styles.list}
                 data={data}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
             />
+            <StatusBar style="auto" />
             <View style={styles.bottom}>
                 <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>Save</Text>
