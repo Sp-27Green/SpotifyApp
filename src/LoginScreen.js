@@ -13,8 +13,8 @@ const discovery = {
 };
 
 const clientInfo = {
-  clientId: '63f3a6f0286e4f7a9e2c30ac0f90ea49', // Your clientId
-  clientSecret: '13fb075c2ff549e6aa9f0d85e77b1476', // Your clientSecret
+  clientId: '300bc0de43ba40de86f1302de4cb8262', // Your clientId
+  clientSecret: 'c2d9c52f79694780955b4c8225483aae', // Your clientSecret
 };
 
 WebBrowser.maybeCompleteAuthSession();
@@ -31,7 +31,7 @@ export default function LoginScreen({ setIsLoggedIn }) {
     {
       clientId: clientInfo.clientId,
       scopes: ['user-follow-read, user-read-private, user-read-email, app-remote-control, streaming, user-read-playback-state, user-modify-playback-state, user-read-currently-playing, playlist-read-private, playlist-modify-public, playlist-modify-private, user-library-read, user-top-read'],
-      redirectUri: 'exp://10.101.167.212:8081',
+      redirectUri: 'exp://10.77.191.107:8081',
       usePKCE: true,
     },
     discovery

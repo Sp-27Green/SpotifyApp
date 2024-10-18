@@ -8,6 +8,9 @@ import TempofyScreen from './src/TempofyScreen';
 import TemplateScreen from './src/TemplateScreen';
 import PlaylistScreen from './src/PlaylistScreen';  
 import LoginScreen from './src/LoginScreen';  
+import AlbumDetail from './src/AlbumDetailScreen'; 
+import PlaylistDetailScreen from './src/PlaylistDetailScreen';
+import ArtistDetailScreen from './src/ArtistDetailScreen';
 import { Ionicons } from '@expo/vector-icons'; 
 
 const Tab = createBottomTabNavigator();
@@ -69,6 +72,9 @@ export default function App() {
             {props => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
           </Stack.Screen>
         )}
+        <Stack.Screen name="AlbumDetail" component={AlbumDetail} />
+        <Stack.Screen name="PlaylistDetailScreen" component={PlaylistDetailScreen} />
+        <Stack.Screen name="ArtistDetailScreen" component={ArtistDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

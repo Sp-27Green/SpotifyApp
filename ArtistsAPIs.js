@@ -107,3 +107,23 @@ export async function getArtistsRelatedArtists(artistID){
   })
   return artistsRelatedJSON
 }
+
+//jace made this, i did this to handle artists discography, couldnt get the other functions to work for me
+export async function getArtistsDiscography(artistId) {
+  if (Date.now() > newUser.getExpiresIn()) {
+    await refreshUserToken();
+  }
+
+  const response = await fetch(`https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album,single,compilation,appears_on`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${newUser.getAccessToken()}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch artist discography');
+  }
+
+  return response.json();
+}

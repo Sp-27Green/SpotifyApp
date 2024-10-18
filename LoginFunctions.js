@@ -8,13 +8,13 @@ WebBrowser.maybeCompleteAuthSession();
 const discovery = {
   authorizationEndpoint: 'https://accounts.spotify.com/authorize',
   tokenEndpoint: 'https://accounts.spotify.com/api/token',
-  redirectUri: 'exp://10.101.167.212:8081'
+  redirectUri: 'exp://10.77.191.107:8081',
 };
 
 // Add your client ID and secret from Spotify developers
 const clientInfo = {
-  clientId: '63f3a6f0286e4f7a9e2c30ac0f90ea49',
-  clientSecret: '13fb075c2ff549e6aa9f0d85e77b1476',
+   clientId: '300bc0de43ba40de86f1302de4cb8262',
+  clientSecret: 'c2d9c52f79694780955b4c8225483aae',
 };
 
 // Authorize function calls the token endpoint to get authorization.

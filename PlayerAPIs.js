@@ -248,3 +248,60 @@ export async function getTheUsersQueue() {
 
     return usersQueue;
 }
+
+// Function to queue a track in the user's playback queue.
+export async function queueTrack(uri) {
+    if (Date.now() > newUser.getExpiresIn()) {
+        await refreshUserToken();
+    }
+
+    if (!uri) {
+        console.error('No URI provided for queuing the track.');
+        return;
+    }
+
+    fetch(`https://api.spotify.com/v1/me/player/queue?uri=${uri}`, {
+        method: "POST",
+        headers: {
+            'Authorization': "Bearer " + newUser.getAccessToken(),
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(response => {
+            if (response.ok) {
+                console.log('Track queued successfully');
+            } else {
+                console.error('Failed to queue track:', response.statusText);
+            }
+        })
+        .catch(error => {
+            console.error('Error queuing track:', error);
+        });
+}
+
+export async function getAllPlaylistItems(playlistID) {
+    if (Date.now() > newUser.getExpiresIn()) {
+        refreshUserToken();
+    }
+    let playlistItemsJSON = [];
+    let nextUrl = 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks';
+
+    while (nextUrl) {
+        await fetch(nextUrl, {
+            method: "GET",
+            headers: {
+                'Authorization': "Bearer " + newUser.getAccessToken(),
+            }
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            playlistItemsJSON = [...playlistItemsJSON, ...responseJson.items];
+            nextUrl = responseJson.next;
+        })
+        .catch((error) => {
+            console.error('Error fetching playlist items:', error);
+            nextUrl = null;
+        });
+    }
+    return { items: playlistItemsJSON };
+}
