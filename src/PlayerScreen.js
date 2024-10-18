@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getCurrentlyPlayingTrack, pausePlayback, nextSong, skipToPrevious } from '../PlayerAPIs'; // Import APIs
+import { getCurrentlyPlayingTrack, pausePlayback, nextSong, skipToPrevious, startResumePlayback } from '../PlayerAPIs'; // Import APIs
 import { useNavigation } from '@react-navigation/native';
 export default function PlayerScreen() {
   const navigation = useNavigation()
@@ -25,7 +25,7 @@ export default function PlayerScreen() {
     if (isPlaying) {
       await pausePlayback(); // Pause playback
     } else {
-      await nextSong(); // Resume playback
+      await startResumePlayback(); // Resume playback
     }
     setIsPlaying(!isPlaying); // Toggle play/pause state
   };

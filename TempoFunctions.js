@@ -46,8 +46,6 @@ export async function startHashTable(playlistID){
 //Paramater is used to determine if the originating list is pulled from a queue or playlist. 
 //For loop is run to create the string, and then string is returned. 
 async function getSongIDList(songListType, playlistItems){
-  //Need to take out after testing. 
-  console.log("getSongIDList parameter: " + playlistItems)
   var songIDString = "";
   playlistItems.forEach( async element => {
     if(songListType == "queue"){
@@ -87,6 +85,7 @@ export async function getCurrentQueue(){
   if(Date.now()  > newUser.getExpiresIn()){
     refreshUserToken()
   }
+  console.log("accessToken " + newUser.getAccessToken())
   fetch('https://api.spotify.com/v1/me/player/queue', {
     method: "GET",
     headers: {
@@ -95,8 +94,7 @@ export async function getCurrentQueue(){
   })
   .then((response) => response.json())
   .then((responseJson) => {
-    //Need to take out after testing. 
-    console.log("get queue response: " + responseJson.queue)
+    console.log("queue log: " + JSON.stringify(responseJson))
     createHashTable("queue", responseJson.queue);
   })
   .catch((error) => {console.error(error)})
