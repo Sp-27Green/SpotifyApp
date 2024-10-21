@@ -70,6 +70,14 @@ export default function PlaylistDetailScreen({ route, navigation }) {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="#1DB954" />
       </TouchableOpacity>
+      {/* Tempofy Button */}
+      <TouchableOpacity style={styles.tempofyButton}
+        onPress={()=> {
+          navigation.navigate("Tempofy",  {playlistID: playlistId})
+        }}
+      >
+        <Text style={styles.tempofyButtonText}>Tempofy</Text>
+      </TouchableOpacity>
 
       {loading ? (
         <Text style={styles.loadingText}>Loading tracks...</Text>
@@ -121,5 +129,18 @@ const styles = StyleSheet.create({
   },
   trackArtist: {
     color: '#AAAAAA',
+  },
+  tempofyButton: {
+    backgroundColor: '#1DB954',
+    paddingVertical: 15,
+    paddingHorizontal: 60,
+    borderRadius: 30,
+    marginTop: 20,
+  },
+  tempofyButtonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    textAlign: "center",
   },
 });

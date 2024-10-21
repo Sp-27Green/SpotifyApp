@@ -71,8 +71,8 @@ export default function App() {
             {props => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
           </Stack.Screen>
         )}
-        <Tab.Screen name="Tempofy" component={TempofyScreen} />
-        <Tab.Screen name="Template" component={TemplateScreen} />
+        <Stack.Screen name="Tempofy" component={TempofyScreen} />
+        <Stack.Screen name="Template" component={TemplateScreen} />
         <Stack.Screen name="AlbumDetail" component={AlbumDetail} />
         <Stack.Screen name="PlaylistDetailScreen" component={PlaylistDetailScreen} />
         <Stack.Screen name="ArtistDetailScreen" component={ArtistDetailScreen} />
