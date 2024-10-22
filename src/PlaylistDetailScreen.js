@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getAllPlaylistItems } from '../PlaylistsAPIs';
+import { getPlaylistItems } from '../PlaylistsAPIs';
 import { startResumePlayback, queueTrack } from '../PlayerAPIs';
 
 export default function PlaylistDetailScreen({ route, navigation }) {
@@ -12,7 +12,7 @@ export default function PlaylistDetailScreen({ route, navigation }) {
   useEffect(() => {
     const fetchPlaylistTracks = async () => {
       try {
-        const fetchedTracks = await getAllPlaylistItems(playlistId);
+        const fetchedTracks = await getPlaylistItems(playlistId);
         setTracks(fetchedTracks?.items || []); // Ensure all tracks are shown
       } catch (error) {
         console.error('Error fetching playlist tracks:', error);
