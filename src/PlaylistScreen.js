@@ -105,7 +105,7 @@ export default function PlaylistScreen() {
       />
 
       {/* Playlists Section */}
-      <Text style={styles.sectionTitle}>Your Playlists</Text>
+      <Text style={styles.sectionTitle}>Playlists</Text>
       <FlatList
         data={filteredPlaylists}
         keyExtractor={(item) => item.id}
@@ -115,7 +115,7 @@ export default function PlaylistScreen() {
       />
 
       {/* Albums Section */}
-      <Text style={styles.sectionTitle}>Your Saved Albums</Text>
+      <Text style={styles.sectionTitle}>Albums</Text>
       <FlatList
         data={filteredAlbums}
         keyExtractor={(item) => item.album.id}
@@ -125,7 +125,7 @@ export default function PlaylistScreen() {
       />
 
       {/* Tracks Section */}
-      <Text style={styles.sectionTitle}>Your Saved Tracks</Text>
+      <Text style={styles.sectionTitle}>Tracks</Text>
       <FlatList
         data={filteredTracks}
         keyExtractor={(item) => item.track.id}
