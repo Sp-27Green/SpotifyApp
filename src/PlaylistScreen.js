@@ -38,6 +38,14 @@ export default function PlaylistScreen() {
   const handlePlay = async (uri) => {
     await startResumePlayback(uri);
   };
+  //Function to display items in Album
+  const handleAlbumPress = (albumId) => {
+    navigation.navigate('AlbumDetail', { albumId });
+  };
+  //Function to display items in Playlist
+  const handlePlaylistPress = (playlistId) => {
+    navigation.navigate('PlaylistDetailScreen', { playlistId });
+  };
 
   // Function to queue a track
   const handleQueueTrack = async (uri) => {
