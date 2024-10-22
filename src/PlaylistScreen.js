@@ -5,6 +5,7 @@ import { getCurrentUsersPlaylists } from '../PlaylistsAPIs';
 import { startResumePlayback, queueTrack } from '../PlayerAPIs';
 import { getUsersSavedAlbums } from '../AlbumAPIs';
 import { getUsersSavedTracks } from '../TracksAPIs';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 export default function PlaylistScreen() {
   const [playlists, setPlaylists] = useState([]);
@@ -14,37 +15,40 @@ export default function PlaylistScreen() {
   const [filteredPlaylists, setFilteredPlaylists] = useState([]);
   const [filteredAlbums, setFilteredAlbums] = useState([]);
   const [filteredTracks, setFilteredTracks] = useState([]);
+  const navigation = useNavigation(); // Get the navigation object
 
   useEffect(() => {
     // Fetch playlists, albums, and tracks when the component mounts
     async function fetchData() {
       const fetchedPlaylists = await getCurrentUsersPlaylists();
       setPlaylists(fetchedPlaylists.items); 
-      setFilteredPlaylists(fetchedPlaylists.items); // Initial filter same as original data
+      setFilteredPlaylists(fetchedPlaylists.items);
 
       const fetchedAlbums = await getUsersSavedAlbums();
       setAlbums(fetchedAlbums.items);
-      setFilteredAlbums(fetchedAlbums.items); 
+      setFilteredAlbums(fetchedAlbums.items);
 
       const fetchedTracks = await getUsersSavedTracks();
       setTracks(fetchedTracks.items);
-      setFilteredTracks(fetchedTracks.items); 
+      setFilteredTracks(fetchedTracks.items);
     }
 
     fetchData();
   }, []);
 
+  // Function to navigate to album detail
+  const handleAlbumPress = (albumId) => {
+    navigation.navigate('AlbumDetailScreen', { albumId }); 
+  };
+
+  // Function to navigate to playlist detail
+  const handlePlaylistPress = (playlistId) => {
+    navigation.navigate('PlaylistDetailScreen', { playlistId }); 
+  };
+
   // Function to handle playback
   const handlePlay = async (uri) => {
     await startResumePlayback(uri);
-  };
-  //Function to display items in Album
-  const handleAlbumPress = (albumId) => {
-    navigation.navigate('AlbumDetail', { albumId });
-  };
-  //Function to display items in Playlist
-  const handlePlaylistPress = (playlistId) => {
-    navigation.navigate('PlaylistDetailScreen', { playlistId });
   };
 
   // Function to queue a track
@@ -72,7 +76,7 @@ export default function PlaylistScreen() {
 
   // Render a playlist, album, or track item
   const renderPlaylistItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handlePlay(item.uri)} style={styles.item}>
+    <TouchableOpacity onPress={() => handlePlaylistPress(item.id)} style={styles.item}>
       {item.images[0] && (
         <Image source={{ uri: item.images[0].url }} style={styles.albumArt} />
       )}
@@ -81,7 +85,7 @@ export default function PlaylistScreen() {
   );
 
   const renderAlbumItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handlePlay(item.album.uri)} style={styles.item}>
+    <TouchableOpacity onPress={() => handleAlbumPress(item.album.id)} style={styles.item}>
       {item.album.images[0] && (
         <Image source={{ uri: item.album.images[0].url }} style={styles.albumArt} />
       )}
@@ -131,9 +135,8 @@ export default function PlaylistScreen() {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
       />
-
-      {/* Tracks Section */}
-      <Text style={styles.sectionTitle}>Tracks</Text>
+    {/* Tracks Section */}
+    <Text style={styles.sectionTitle}>Tracks</Text>
       <FlatList
         data={filteredTracks}
         keyExtractor={(item) => item.track.id}
@@ -143,6 +146,7 @@ export default function PlaylistScreen() {
       />
     </View>
   );
+  
 }
 
 const styles = StyleSheet.create({
