@@ -38,7 +38,7 @@ export default function PlaylistScreen() {
 
   // Function to navigate to album detail
   const handleAlbumPress = (albumId) => {
-    navigation.navigate('AlbumDetailScreen', { albumId }); 
+    navigation.navigate('AlbumDetail', { albumId }); 
   };
 
   // Function to navigate to playlist detail
