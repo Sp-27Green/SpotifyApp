@@ -80,7 +80,7 @@ export default function ArtistDetailScreen({ route, navigation }) {
   };
 
   const handleArtistPress = (artistId) => {
-    navigation.navigate('ArtistDetail', { artistId });
+    navigation.navigate('ArtistDetailScreen', { artistId });
   };
 
   return (
@@ -114,7 +114,7 @@ export default function ArtistDetailScreen({ route, navigation }) {
                     <Image source={{ uri: item.images[0]?.url }} style={styles.albumImage} />
                     <View style={styles.albumInfo}>
                       <Text style={styles.albumTitle}>{item.name}</Text>
-                      <Text style={styles.trackTempo}>Tempo: {item.tempo || 'Unknown'}</Text> 
+                      {/* <Text style={styles.trackTempo}>Tempo: {item.tempo || 'Unknown'}</Text> */}
                     </View>
                   </View>
                 </TouchableOpacity>
