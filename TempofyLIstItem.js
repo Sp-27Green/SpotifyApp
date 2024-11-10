@@ -37,11 +37,13 @@ export default function TempofyListItem({ item, onDelete }) {
                 transform: [{ translateX: translateX }],
             }}
         >
-            <View style={styles.item} {...panResponder.panHandlers}>
-                <Text style={styles.text}>{item.songTitle}</Text>
-                <Text style={styles.text}>{item.artist}</Text>
-                <Text style={styles.text}>{item.tempo}</Text>
-                <Image source = {{uri: item.albumImage}} style = {{ width: 50, height: 50 }}/>
+            <View style={styles.cell} {...panResponder.panHandlers}>
+                <Image source = {{uri: item.albumImage}} style={styles.albumArt}/>
+                <View style={styles.info}>
+                    <Text style={styles.text}>{item.songTitle}</Text>
+                    <Text style={styles.text}>{item.artist}</Text>
+                    <Text style={styles.text}>{"Tempo: " + item.tempo}</Text>
+                </View>
             </View>
             <TouchableOpacity
                 style={styles.deleteButton}
@@ -66,7 +68,7 @@ text:{
 },
 itemContainer: {
     width: 400,
-    height: 150,
+    height: 75,
     flexDirection: "row",
 },
 deleteButton: {
@@ -82,4 +84,20 @@ deleteButtonText: {
     color: "white",
     fontWeight: "bold",
 },
+albumArt: {
+    width: 50,
+    height: 50,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  info: {
+    flex: 1,
+  },
+  cell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
 });

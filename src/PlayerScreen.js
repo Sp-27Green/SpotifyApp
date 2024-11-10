@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getCurrentlyPlayingTrack, pausePlayback, nextSong, skipToPrevious, startResumePlayback } from '../PlayerAPIs'; // Import APIs
+import { getCurrentlyPlayingTrack, pausePlayback, nextSong, skipToPrevious, startResumePlayback} from '../PlayerAPIs'; // Import APIs
 import { useNavigation } from '@react-navigation/native';
 export default function PlayerScreen() {
   const navigation = useNavigation()
@@ -13,11 +13,18 @@ export default function PlayerScreen() {
     fetchCurrentlyPlaying();
   }, []);
 
+  useEffect(() => {
+    setTimeout(() => {
+      fetchCurrentlyPlaying();
+    }, 3000);
+});
+
   const fetchCurrentlyPlaying = async () => {
     const track = await getCurrentlyPlayingTrack(); // Fetch currently playing track from Spotify
+    
     if (track && track.item) {
       setCurrentTrack(track.item); // Set track information
-      setIsPlaying(!track.is_playing); // Update play/pause state based on Spotify
+      setIsPlaying(track.is_playing); // Update play/pause state based on Spotify
     }
   };
 
@@ -32,12 +39,10 @@ export default function PlayerScreen() {
 
   const handleNextSong = async () => {
     await nextSong(); // Skip to next track
-    fetchCurrentlyPlaying(); // Fetch new track info after skipping
   };
 
   const handlePreviousSong = async () => {
     await skipToPrevious(); // Go back to previous track
-    fetchCurrentlyPlaying(); // Fetch new track info after skipping back
   };
 
   const handleToggleModal = () => {
@@ -62,7 +67,7 @@ export default function PlayerScreen() {
       <Text style={styles.welcomeText}>Now Playing</Text>
 
       {currentTrack && (
-        <View>
+        <View style={styles.albumContainer}>
           <Image
             source={{ uri: currentTrack.album.images[0].url }}
             style={styles.albumArt}
@@ -228,5 +233,10 @@ const styles = StyleSheet.create({
   closeButton: {
     alignSelf: 'center',
     marginTop: 20,
+  },
+  albumContainer: {
+    backgroundColor: '#1E1E1E',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
